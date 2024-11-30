@@ -22,7 +22,15 @@ app.use(helmet());
 app.use(limiter);
 app.use(
   cors({
-    origin: ["http://localhost:3000","http://localhost:3001","https://karnalwebtech.vercel.app", "https://inventory-7773.vercel.app"], // Allow only your frontend to access the API
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "https://karnalwebtech.vercel.app",
+      "https://inventory-7773.vercel.app",
+      "https://karnalwebtech-xi.vercel.app",
+      "https://www.thesalesmens.com",
+      "https://thesalesmens.com"
+    ], // Allow only your frontend to access the API
     methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed methods
     exposedHeaders: "Set-Cookie",
     allowedHeaders: [
@@ -38,7 +46,10 @@ app.use(
 );
 app.get("/api/csrf-token", (req, res) => {
   // console.log('call')
-  res.status(200).cookie("XSRF-TOKEN", req.csrfToken()).json({ success: true,token:req.csrfToken() }); // Optional, for other use cases
+  res
+    .status(200)
+    .cookie("XSRF-TOKEN", req.csrfToken())
+    .json({ success: true, token: req.csrfToken() }); // Optional, for other use cases
 });
 //-----loaders
 //------------------ crm
@@ -68,8 +79,6 @@ const karnal_services = karnal_servicesLoader(karnal_repositories);
 // Initialize Controllers
 const karnal_controllers = karnal_controllersLoader(karnal_services);
 karnal_routesLoader(app, karnal_controllers);
-
-
 
 //comman router
 // Initialize dependencies
