@@ -27,7 +27,7 @@ app.use(
       "http://localhost:3001",
       "https://karnalwebtech.vercel.app",
       "https://inventory-7773.vercel.app",
-      "https://karnalwebtech-xi.vercel.app",
+      "https://karnalwebtech-two.vercel.app",
       "https://www.thesalesmens.com",
       "https://thesalesmens.com"
     ], // Allow only your frontend to access the API
