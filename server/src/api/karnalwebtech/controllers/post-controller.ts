@@ -26,10 +26,7 @@ class PostController {
     async (req: Request, res: Response, next: NextFunction) => {
       const userId = (req as any).user?._id; // Use the correct type for the request user
       const files = req.files;
-      const cacheKey = `posts_rowsPerPage=6&page=1`;
-
-      // Check if data is in Redis cache
-      await redisClient1.del(cacheKey);
+  
       // Check if URL already exists
       const isExistingUrl = await this.postService.findByUrl(
         req.body.metaCanonicalUrl
@@ -70,6 +67,7 @@ class PostController {
       // Check if data is in Redis cache
       const cachedPosts = await redisClient1.get(cacheKey);
       if (cachedPosts) {
+        console.log('cashe hit')
         return res.json(JSON.parse(cachedPosts)); // Return cached posts
       }
       const [result, dataCounter] = await Promise.all([
@@ -87,7 +85,7 @@ class PostController {
       };
 
       // Store the result data in Redis cache (cache for 1 hour)
-      await redisClient1.setEx(cacheKey, 3600, JSON.stringify(cacheData));
+      await redisClient1.set(cacheKey, JSON.stringify(cacheData));
 
       return this.sendResponse(res, "Post fetched successfully", 200, {
         result,
@@ -130,7 +128,7 @@ class PostController {
             result,
           };
           try {
-            await redisClient1.setEx(cacheKey, 3600, JSON.stringify(cacheData)); // Cache for 1 hour
+            await redisClient1.set(cacheKey, JSON.stringify(cacheData)); // Cache for 1 hour
             console.log("Data cached successfully");
           } catch (cacheError) {
             console.log("Cache set failed", cacheError);
@@ -152,10 +150,7 @@ class PostController {
     async (req: Request, res: Response, next: NextFunction) => {
       const user: string = (req as any).user._id;
       const files = req.files;
-      const cacheKey = `posts_rowsPerPage=6&page=1`;
-
-      // Check if data is in Redis cache
-      await redisClient1.del(cacheKey);
+    
       if (!user) {
         return next(new ErrorHandler("User not authenticated", 401)); // Changed to 401
       }

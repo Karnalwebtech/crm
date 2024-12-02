@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import AsyncHandler from "../../../middlewares/AsyncHandler";
 import CategorieService from "../../../services/karnalwebtech/post-caregorie-service";
 import ErrorHandler from "../../../utils/ErrorHandler";
+import { redisClient2 } from "../../../loaders/redis";
 
 class CategorieController {
   constructor(private categorieService: CategorieService) {}
@@ -27,7 +28,8 @@ class CategorieController {
       const files = req.files;
       // Check if URL already exists
       const isExistingUrl = await this.categorieService.findByExistUrl(
-        req.body.metaCanonicalUrl,next
+        req.body.metaCanonicalUrl,
+        next
       );
       if (isExistingUrl) {
         return next(
@@ -60,12 +62,31 @@ class CategorieController {
     async (req: Request, res: Response, next: NextFunction) => {
       const query = req.query;
       const resultPerPage = Number(query.rowsPerPage);
-
+      const cacheKey = `categorie_${new URLSearchParams(
+        query as any
+      ).toString()}`;
+      const catCashe = await redisClient2.get(cacheKey);
+      if (catCashe) {
+        console.log("cashe his");
+        return res.json(JSON.parse(catCashe)); // Return cached posts
+      }
+      console.log("cashe miss");
       // Fetch categories and data counter
       const [result, dataCounter] = await Promise.all([
         this.categorieService.all(query),
         this.categorieService.data_counter(query),
       ]);
+
+      const cacheData = {
+        success: true,
+        message: "Projects fetched successfully",
+        data: {
+          result: result, // Assuming result is plain data
+          rowsPerPage: resultPerPage,
+          dataCounter: dataCounter,
+        },
+      };
+      await redisClient2.set(cacheKey, JSON.stringify(cacheData));
 
       return this.sendResponse(res, "Categories fetched successfully", 200, {
         result,
@@ -84,11 +105,27 @@ class CategorieController {
           new ErrorHandler("Either ID or slug parameter is required.", 400)
         );
       }
+      const cacheKey = id ? `cate:${id}` : `cate:${slug}`;
+      console.log(`Checking cache for key: ${cacheKey}`);
+
+      const cachedPosts = await redisClient2.get(cacheKey);
+      if (cachedPosts) {
+        console.log("Cache hit");
+        return res.json(JSON.parse(cachedPosts)); // Return cached posts
+      }
+      console.log("Cache miss");
       // Fetch category by ID
       const result = id
         ? await this.categorieService.findBYpageid(id, next)
         : await this.categorieService.findBySlug(slug, next);
       if (result) {
+        const cacheData = {
+          success: true,
+          message: "Post fetched successfully",
+          result,
+        };
+        await redisClient2.set(cacheKey, JSON.stringify(cacheData)); // Cache for 1 hour
+
         return this.sendResponse(
           res,
           "Category fetched successfully",
@@ -106,7 +143,7 @@ class CategorieController {
     async (req: Request, res: Response, next: NextFunction) => {
       const user: string = (req as any).user._id;
       const files = req.files;
-    
+
       if (!user) {
         return next(new ErrorHandler("User not authenticated", 401)); // Changed to 401
       }
