@@ -3,6 +3,7 @@ import AsyncHandler from "../../../middlewares/AsyncHandler";
 import ErrorHandler from "../../../utils/ErrorHandler";
 import PostService from "../../../services/karnalwebtech/post-service";
 import { redisClient1 } from "../../../loaders/redis";
+import generateSitemap from "../../../utils/sitemapUtils";
 
 class PostController {
   constructor(private postService: PostService) {}
@@ -26,7 +27,7 @@ class PostController {
     async (req: Request, res: Response, next: NextFunction) => {
       const userId = (req as any).user?._id; // Use the correct type for the request user
       const files = req.files;
-  
+
       // Check if URL already exists
       const isExistingUrl = await this.postService.findByUrl(
         req.body.metaCanonicalUrl
@@ -63,7 +64,7 @@ class PostController {
       const query = req.query;
       const resultPerPage = Number(query.rowsPerPage);
       // const cacheKey = `posts_${new URLSearchParams(query as any).toString()}`;
-
+    //  generateSitemap();
       // // Check if data is in Redis cache
       // const cachedPosts = await redisClient1.get(cacheKey);
       // if (cachedPosts) {
@@ -99,13 +100,15 @@ class PostController {
     async (req: Request, res: Response, next: NextFunction) => {
       const { id, slug } = req.params;
       if (!id && !slug) {
-        return next(new ErrorHandler("Either ID or slug parameter is required.", 400));
+        return next(
+          new ErrorHandler("Either ID or slug parameter is required.", 400)
+        );
       }
-  
+
       // Generate cache key based on the id or slug
       // const cacheKey = id ? `post:${id}` : `post:${slug}`;
       // console.log(`Checking cache for key: ${cacheKey}`);
-  
+
       try {
         // Check if data is in Redis cache
         // const cachedPosts = await redisClient1.get(cacheKey);
@@ -114,12 +117,12 @@ class PostController {
         //   return res.json(JSON.parse(cachedPosts)); // Return cached posts
         // }
         // console.log("Cache miss");
-  
+
         // Fetch post data from database
         const result = id
           ? await this.postService.findBYpageid(id, next)
           : await this.postService.findBYSlug(slug, next);
-  
+
         if (result) {
           // Store the result in Redis cache
           // const cacheData = {
@@ -133,10 +136,15 @@ class PostController {
           // } catch (cacheError) {
           //   console.log("Cache set failed", cacheError);
           // }
-  
-          return this.sendResponse(res, "Post fetched successfully", 200, result);
+
+          return this.sendResponse(
+            res,
+            "Post fetched successfully",
+            200,
+            result
+          );
         }
-  
+
         return next(new ErrorHandler("Post not found", 404));
       } catch (error) {
         console.log("Error in fetching post", error);
@@ -150,7 +158,7 @@ class PostController {
     async (req: Request, res: Response, next: NextFunction) => {
       const user: string = (req as any).user._id;
       const files = req.files;
-    
+
       if (!user) {
         return next(new ErrorHandler("User not authenticated", 401)); // Changed to 401
       }
