@@ -1,5 +1,6 @@
 // lib/redis.ts
 import { createClient } from "redis";
+import { cacheManager } from "../utils/redis/cacheManager";
 
 // Redis Client 1 (for example, for the main application database)
 const redisClient1 = createClient({

@@ -62,15 +62,15 @@ class PortfolioController {
     async (req: Request, res: Response, next: NextFunction) => {
       const query = req.query;
       const resultPerPage = Number(query.rowsPerPage);
-      const cacheKey = `projects_${new URLSearchParams(
-        query as any
-      ).toString()}`;
-      const cashedprojects = await redisClient2.get(cacheKey);
-      if (cashedprojects) {
-        console.log("cashe hit");
-        return res.json(JSON.parse(cashedprojects)); // Return cached posts
-      }
-      console.log("cashe miss");
+      // const cacheKey = `projects_${new URLSearchParams(
+      //   query as any
+      // ).toString()}`;
+      // const cashedprojects = await redisClient2.get(cacheKey);
+      // if (cashedprojects) {
+      //   console.log("cashe hit");
+      //   return res.json(JSON.parse(cashedprojects)); // Return cached posts
+      // }
+      // console.log("cashe miss");
 
       // Fetch post and data counter
       const [result, dataCounter] = await Promise.all([
@@ -78,16 +78,16 @@ class PortfolioController {
         this.portfoliotService.data_counter(query),
       ]);
 
-      const cacheData = {
-        success: true,
-        message: "Projects fetched successfully",
-        data: {
-          result: result, // Assuming result is plain data
-          rowsPerPage: resultPerPage,
-          dataCounter: dataCounter,
-        },
-      };
-      await redisClient2.set(cacheKey, JSON.stringify(cacheData));
+      // const cacheData = {
+      //   success: true,
+      //   message: "Projects fetched successfully",
+      //   data: {
+      //     result: result, // Assuming result is plain data
+      //     rowsPerPage: resultPerPage,
+      //     dataCounter: dataCounter,
+      //   },
+      // };
+      // await redisClient2.set(cacheKey, JSON.stringify(cacheData));
       return this.sendResponse(res, "Post fetched successfully", 200, {
         result,
         resultPerPage,

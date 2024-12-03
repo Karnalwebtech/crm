@@ -62,30 +62,30 @@ class PostController {
     async (req: Request, res: Response, next: NextFunction) => {
       const query = req.query;
       const resultPerPage = Number(query.rowsPerPage);
-      const cacheKey = `posts_${new URLSearchParams(query as any).toString()}`;
+      // const cacheKey = `posts_${new URLSearchParams(query as any).toString()}`;
 
-      // Check if data is in Redis cache
-      const cachedPosts = await redisClient1.get(cacheKey);
-      if (cachedPosts) {
-        console.log('cashe hit')
-        return res.json(JSON.parse(cachedPosts)); // Return cached posts
-      }
+      // // Check if data is in Redis cache
+      // const cachedPosts = await redisClient1.get(cacheKey);
+      // if (cachedPosts) {
+      //   console.log('cashe hit')
+      //   return res.json(JSON.parse(cachedPosts)); // Return cached posts
+      // }
       const [result, dataCounter] = await Promise.all([
         this.postService.all(query),
         this.postService.data_counter(query),
       ]);
-      const cacheData = {
-        success: true,
-        message: "Post fetched successfully",
-        data: {
-          result: result, // Assuming result is plain data
-          rowsPerPage: resultPerPage,
-          dataCounter: dataCounter,
-        },
-      };
+      // const cacheData = {
+      //   success: true,
+      //   message: "Post fetched successfully",
+      //   data: {
+      //     result: result, // Assuming result is plain data
+      //     rowsPerPage: resultPerPage,
+      //     dataCounter: dataCounter,
+      //   },
+      // };
 
-      // Store the result data in Redis cache (cache for 1 hour)
-      await redisClient1.set(cacheKey, JSON.stringify(cacheData));
+      // // Store the result data in Redis cache (cache for 1 hour)
+      // await redisClient1.set(cacheKey, JSON.stringify(cacheData));
 
       return this.sendResponse(res, "Post fetched successfully", 200, {
         result,
@@ -103,17 +103,17 @@ class PostController {
       }
   
       // Generate cache key based on the id or slug
-      const cacheKey = id ? `post:${id}` : `post:${slug}`;
-      console.log(`Checking cache for key: ${cacheKey}`);
+      // const cacheKey = id ? `post:${id}` : `post:${slug}`;
+      // console.log(`Checking cache for key: ${cacheKey}`);
   
       try {
         // Check if data is in Redis cache
-        const cachedPosts = await redisClient1.get(cacheKey);
-        if (cachedPosts) {
-          console.log("Cache hit");
-          return res.json(JSON.parse(cachedPosts)); // Return cached posts
-        }
-        console.log("Cache miss");
+        // const cachedPosts = await redisClient1.get(cacheKey);
+        // if (cachedPosts) {
+        //   console.log("Cache hit");
+        //   return res.json(JSON.parse(cachedPosts)); // Return cached posts
+        // }
+        // console.log("Cache miss");
   
         // Fetch post data from database
         const result = id
@@ -122,17 +122,17 @@ class PostController {
   
         if (result) {
           // Store the result in Redis cache
-          const cacheData = {
-            success: true,
-            message: "Post fetched successfully",
-            result,
-          };
-          try {
-            await redisClient1.set(cacheKey, JSON.stringify(cacheData)); // Cache for 1 hour
-            console.log("Data cached successfully");
-          } catch (cacheError) {
-            console.log("Cache set failed", cacheError);
-          }
+          // const cacheData = {
+          //   success: true,
+          //   message: "Post fetched successfully",
+          //   result,
+          // };
+          // try {
+          //   await redisClient1.set(cacheKey, JSON.stringify(cacheData)); // Cache for 1 hour
+          //   console.log("Data cached successfully");
+          // } catch (cacheError) {
+          //   console.log("Cache set failed", cacheError);
+          // }
   
           return this.sendResponse(res, "Post fetched successfully", 200, result);
         }

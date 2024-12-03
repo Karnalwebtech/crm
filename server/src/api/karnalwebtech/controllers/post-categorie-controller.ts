@@ -62,31 +62,31 @@ class CategorieController {
     async (req: Request, res: Response, next: NextFunction) => {
       const query = req.query;
       const resultPerPage = Number(query.rowsPerPage);
-      const cacheKey = `categorie_${new URLSearchParams(
-        query as any
-      ).toString()}`;
-      const catCashe = await redisClient2.get(cacheKey);
-      if (catCashe) {
-        console.log("cashe his");
-        return res.json(JSON.parse(catCashe)); // Return cached posts
-      }
-      console.log("cashe miss");
+      // const cacheKey = `categorie_${new URLSearchParams(
+      //   query as any
+      // ).toString()}`;
+      // const catCashe = await redisClient2.get(cacheKey);
+      // if (catCashe) {
+      //   console.log("cashe his");
+      //   return res.json(JSON.parse(catCashe)); // Return cached posts
+      // }
+      // console.log("cashe miss");
       // Fetch categories and data counter
       const [result, dataCounter] = await Promise.all([
         this.categorieService.all(query),
         this.categorieService.data_counter(query),
       ]);
 
-      const cacheData = {
-        success: true,
-        message: "Projects fetched successfully",
-        data: {
-          result: result, // Assuming result is plain data
-          rowsPerPage: resultPerPage,
-          dataCounter: dataCounter,
-        },
-      };
-      await redisClient2.set(cacheKey, JSON.stringify(cacheData));
+      // const cacheData = {
+      //   success: true,
+      //   message: "Projects fetched successfully",
+      //   data: {
+      //     result: result, // Assuming result is plain data
+      //     rowsPerPage: resultPerPage,
+      //     dataCounter: dataCounter,
+      //   },
+      // };
+      // await redisClient2.set(cacheKey, JSON.stringify(cacheData));
 
       return this.sendResponse(res, "Categories fetched successfully", 200, {
         result,
@@ -105,26 +105,26 @@ class CategorieController {
           new ErrorHandler("Either ID or slug parameter is required.", 400)
         );
       }
-      const cacheKey = id ? `cate:${id}` : `cate:${slug}`;
-      console.log(`Checking cache for key: ${cacheKey}`);
+      // const cacheKey = id ? `cate:${id}` : `cate:${slug}`;
+      // console.log(`Checking cache for key: ${cacheKey}`);
 
-      const cachedPosts = await redisClient2.get(cacheKey);
-      if (cachedPosts) {
-        console.log("Cache hit");
-        return res.json(JSON.parse(cachedPosts)); // Return cached posts
-      }
-      console.log("Cache miss");
+      // const cachedPosts = await redisClient2.get(cacheKey);
+      // if (cachedPosts) {
+      //   console.log("Cache hit");
+      //   return res.json(JSON.parse(cachedPosts)); // Return cached posts
+      // }
+      // console.log("Cache miss");
       // Fetch category by ID
       const result = id
         ? await this.categorieService.findBYpageid(id, next)
         : await this.categorieService.findBySlug(slug, next);
       if (result) {
-        const cacheData = {
-          success: true,
-          message: "Post fetched successfully",
-          result,
-        };
-        await redisClient2.set(cacheKey, JSON.stringify(cacheData)); // Cache for 1 hour
+        // const cacheData = {
+        //   success: true,
+        //   message: "Post fetched successfully",
+        //   result,
+        // };
+        // await redisClient2.set(cacheKey, JSON.stringify(cacheData)); // Cache for 1 hour
 
         return this.sendResponse(
           res,
