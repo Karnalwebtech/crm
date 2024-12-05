@@ -52,7 +52,7 @@ class TagService {
         return this.handleError("SEO data not added to database", next);
       }
 
-      return await this.tagRepository.create(data, imageData, seo, user_id);
+      return await this.tagRepository.create(data, imageData, seo, user_id,next);
     } catch (error: any) {
       next(new ErrorHandler(error.message || "Internal Server Error", 500));
     }
@@ -83,7 +83,7 @@ class TagService {
         return this.handleError("SEO data not added to database", next);
       }
 
-      return await this.tagRepository.update(data, imageData, user_id);
+      return await this.tagRepository.update(data, imageData, user_id,next);
     } catch (error: any) {
       next(new ErrorHandler(error.message || "Internal Server Error", 500));
     }

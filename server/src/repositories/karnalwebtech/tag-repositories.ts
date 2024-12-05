@@ -4,14 +4,11 @@ import ApiFeatures from "../../utils/apiFeatuers";
 import ErrorHandler from "../../utils/ErrorHandler";
 import { generateRandomId } from "../../utils/generateRandomId";
 import TagModel from "../../models/karnalwebtech/tag";
-
+import ImageRepository from "../../utils/comman-repositories/imageRepository";
+const imageRepository = new ImageRepository();
 class TagRepository {
   // Reusable function to generate unique category ID
-  private generateId(
-    uuid: string,
-    randomId: string,
-    number: number
-  ): string {
+  private generateId(uuid: string, randomId: string, number: number): string {
     return `tag_${randomId.toLowerCase()}_${uuid}${number}`;
   }
 
@@ -31,10 +28,24 @@ class TagRepository {
   }
 
   // Create a new category
-  async create(data: any, image_data: any, seo: any, user_id: string) {
+  async create(
+    data: any,
+    image_data: any,
+    seo: any,
+    user_id: string,
+    next: NextFunction
+  ) {
     try {
       const randomId = generateRandomId();
-      const { title, description,content, uuid, type, status, metaCanonicalUrl } = data;
+      const {
+        title,
+        description,
+        content,
+        uuid,
+        type,
+        status,
+        metaCanonicalUrl,
+      } = data;
       const imageIds = image_data.map((item: any) => item._id);
 
       // Get next category number
@@ -46,7 +57,8 @@ class TagRepository {
       // Prepare data to be saved
       const newData = {
         _no: counter,
-        title,description,
+        title,
+        description,
         content,
         status,
         type: type,
@@ -56,7 +68,20 @@ class TagRepository {
         tag_id: tag_id,
         audit_log: user_id,
       };
-
+      if (imageIds) {
+        const updateData = {
+          displayedpath: newData.slug, // Set the displayed path to the category slug
+          is_active: true, // Mark the image as active
+        };
+        const oldImageId = "";
+        await imageRepository.updateImage(
+          imageIds,
+          "karnalwebtech",
+          oldImageId,
+          updateData,
+          next
+        );
+      }
       // Create and save the new tag
       const new_data = new TagModel(newData);
       return await new_data.save();
@@ -116,20 +141,26 @@ class TagRepository {
   }
 
   // Update a tag
-  async update(data: any, image_data: any, user_id: string) {
-    const { title, description,content, status, metaCanonicalUrl } = data;
+  async update(data: any, image_data: any, user_id: string,next:NextFunction) {
+    const { title, description, content, status, metaCanonicalUrl } = data;
     const image_ids = image_data?.length
       ? image_data.map((item: any) => item._id)
       : data?.images;
 
     const updated_data = {
       title,
-      content,description,
+      content,
+      description,
       status: status === "" ? "published" : status,
       slug: metaCanonicalUrl,
       feature_image: image_ids?.length ? image_ids : undefined,
       audit_log: user_id,
     };
+
+    const post_prev_data: any = await TagModel.findOne({
+      tag_id: data.id,
+    });
+
     const result = await TagModel.findOneAndUpdate(
       { tag_id: data.id },
       updated_data,
@@ -144,6 +175,20 @@ class TagRepository {
       throw new Error("Tag not found");
     }
 
+    if (image_ids) {
+      const updateData = {
+        displayedpath: result.slug, // Set the displayed path to the category slug
+        is_active: true, // Mark the image as active
+      };
+      const oldImageId = post_prev_data.feature_image._id;
+      await imageRepository.updateImage(
+        image_ids,
+        "karnalwebtech",
+        oldImageId,
+        updateData,
+        next
+      );
+    }
     return result;
   }
 

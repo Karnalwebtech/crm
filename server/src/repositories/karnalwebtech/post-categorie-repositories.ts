@@ -4,7 +4,8 @@ import User from "../../models/primary/userModel";
 import ApiFeatures from "../../utils/apiFeatuers";
 import ErrorHandler from "../../utils/ErrorHandler";
 import { generateRandomId } from "../../utils/generateRandomId";
-
+import ImageRepository from "../../utils/comman-repositories/imageRepository";
+const imageRepository = new ImageRepository();
 class CategorieRepository {
   // Reusable function to generate unique category ID
   private generateCategoryId(
@@ -31,7 +32,13 @@ class CategorieRepository {
   }
 
   // Create a new category
-  async create(data: any, image_data: any, seo: any, user_id: string) {
+  async create(
+    data: any,
+    image_data: any,
+    seo: any,
+    user_id: string,
+    next: NextFunction
+  ) {
     try {
       const randomId = generateRandomId();
       const {
@@ -66,6 +73,20 @@ class CategorieRepository {
         audit_log: user_id,
       };
 
+      if (imageIds) {
+        const updateData = {
+          displayedpath: newCategoryData.slug, // Set the displayed path to the category slug
+          is_active: true, // Mark the image as active
+        };
+        const oldImageId = "";
+        await imageRepository.updateImage(
+          imageIds,
+          "karnalwebtech",
+          oldImageId,
+          updateData,
+          next
+        );
+      }
       // Create and save the new category
       const newCategory = new PostCategorieModel(newCategoryData);
       return await newCategory.save();
@@ -141,7 +162,12 @@ class CategorieRepository {
   }
 
   // Update a category
-  async update(data: any, image_data: any, user_id: string) {
+  async update(
+    data: any,
+    image_data: any,
+    user_id: string,
+    next: NextFunction
+  ) {
     const { title, content, status, description, metaCanonicalUrl } = data;
     const image_ids = image_data?.length
       ? image_data.map((item: any) => item._id)
@@ -156,6 +182,13 @@ class CategorieRepository {
       feature_image: image_ids?.length ? image_ids : undefined,
       audit_log: user_id,
     };
+    // Fetch the previous post data to compare old images
+    const post_prev_data: any = await PostCategorieModel.findOne({
+      cat_id: data.id,
+    });
+    if (!post_prev_data) {
+      return next(new ErrorHandler("Post not found", 404));
+    }
     const updated_category = await PostCategorieModel.findOneAndUpdate(
       { cat_id: data.id },
       updated_data,
@@ -169,7 +202,22 @@ class CategorieRepository {
     if (!updated_category) {
       throw new Error("Category not found");
     }
+    // Helper function for image updates with error handling
 
+    if (image_ids) {
+      const updateData = {
+        displayedpath: updated_category.slug, // Set the displayed path to the category slug
+        is_active: true, // Mark the image as active
+      };
+      const oldImageId = post_prev_data.feature_image._id;
+      await imageRepository.updateImage(
+        image_ids,
+        "karnalwebtech",
+        oldImageId,
+        updateData,
+        next
+      );
+    }
     return updated_category;
   }
 

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import ImageController from "../controllers/image-controller";
 import upload from "../../../middlewares/multer";
+import PostService from "../../../utils/comman-repositories/get-single-fields";
 
 const imageRoutes = (imageController: ImageController) => {
   const router = Router();
@@ -10,6 +11,8 @@ const imageRoutes = (imageController: ImageController) => {
     // authorizeRoles("admin", "employee"),
     imageController.all.bind(imageController)
   );
+  router.get("/image-url", PostService.getImageUrls);
+
   router.get(
     "/:id",
     // isAuthenticatedUser,
@@ -23,7 +26,7 @@ const imageRoutes = (imageController: ImageController) => {
     // authorizeRoles("admin", "employee"),
     imageController.update.bind(imageController)
   );
-  
+
   return router;
 };
 export default imageRoutes;

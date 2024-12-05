@@ -4,7 +4,8 @@ import ApiFeatures from "../../utils/apiFeatuers";
 import ErrorHandler from "../../utils/ErrorHandler";
 import { generateRandomId } from "../../utils/generateRandomId";
 import PostModel from "../../models/karnalwebtech/post-model";
-
+import ImageRepository from "../../utils/comman-repositories/imageRepository";
+const imageRepository = new ImageRepository();
 class PostRepository {
   // Reusable function to generate unique post ID
   private generatePostId(
@@ -33,12 +34,13 @@ class PostRepository {
   }
 
   // Create a new post
-  async create(data: any, image_data: any, seo: any, user_id: string) {
+  async create(data: any, image_data: any, seo: any, user_id: string,next:NextFunction) {
     try {
       const randomId = generateRandomId();
       const {
         title,
-        content,description,
+        content,
+        description,
         uuid,
         categorie,
         tags,
@@ -58,7 +60,8 @@ class PostRepository {
         _no: postNumber,
         title,
         content,
-        status,description,
+        status,
+        description,
         categorie: categorie
           ? categorie.split(",")
           : ["6741bd2663fa4c1a8dd7548b"], // Default categorie ID
@@ -72,7 +75,28 @@ class PostRepository {
 
       // Create and save the new post
       const post = new PostModel(newPostData);
-      return await post.save();
+      const savedPost: any = await post.save(); // Save the post first to get the post with populated fields
+
+      // Now populate the categories after the post is saved
+      await savedPost.populate("categorie");
+      // Prepare image update promises for updating the displayed path and activating the image
+
+
+      if (imageIds) {
+        const updateData = {
+          displayedpath:  `${savedPost?.categorie[0]?.slug}/${newPostData.slug}`, // Set the displayed path to the category slug
+          is_active: true, // Mark the image as active
+        };
+        const oldImageId = "";
+        await imageRepository.updateImage(
+          imageIds,
+          "karnalwebtech",
+          oldImageId,
+          updateData,
+          next
+        );
+      }
+      return await savedPost;
     } catch (error: any) {
       throw new Error(`Error creating post: ${error.message}`);
     }
@@ -129,15 +153,24 @@ class PostRepository {
   }
 
   // Update a post
-  async update(data: any, image_data: any, user_id: string) {
-    const { title, content, description,categorie, tags, status, metaCanonicalUrl } = data;
+  async update(data: any, image_data: any, user_id: string,next:NextFunction) {
+    const {
+      title,
+      content,
+      description,
+      categorie,
+      tags,
+      status,
+      metaCanonicalUrl,
+    } = data;
     const image_ids = image_data?.length
       ? image_data.map((item: any) => item._id)
       : data?.images;
 
     const updated_data: any = {
       title,
-      content,description,
+      content,
+      description,
       categorie: categorie
         ? categorie.split(",")
         : ["6741bd2663fa4c1a8dd7548b"], // Default categorie ID
@@ -147,8 +180,10 @@ class PostRepository {
       feature_image: image_ids?.length ? image_ids : undefined,
       audit_log: user_id,
     };
-
-    const updated_post = await PostModel.findOneAndUpdate(
+    const post_prev_data: any = await PostModel.findOne({
+      post_id: data.id,
+    });
+    const updated_post:any = await PostModel.findOneAndUpdate(
       { post_id: data.id },
       updated_data,
       {
@@ -160,6 +195,23 @@ class PostRepository {
 
     if (!updated_post) {
       throw new Error("Post not found");
+    }
+
+    await updated_post.populate("categorie");
+
+    if (image_ids) {
+      const updateData = {
+        displayedpath:  `${updated_post?.categorie[0]?.slug}/${updated_post.slug}`, 
+        is_active: true, // Mark the image as active
+      };
+      const oldImageId = post_prev_data.feature_image._id;
+      await imageRepository.updateImage(
+        image_ids,
+        "karnalwebtech",
+        oldImageId,
+        updateData,
+        next
+      );
     }
 
     return updated_post;
@@ -184,11 +236,9 @@ class PostRepository {
 
     return result;
   }
-   // Find post by page ID
-   async findBYSlug(id: string, next: NextFunction) {
-    const result = await this.populatePostData(
-      PostModel.findOne({ slug: id })
-    );
+  // Find post by page ID
+  async findBYSlug(id: string, next: NextFunction) {
+    const result = await this.populatePostData(PostModel.findOne({ slug: id }));
 
     if (!result) {
       return next(new ErrorHandler(`Post with ID ${id} not found`, 404));

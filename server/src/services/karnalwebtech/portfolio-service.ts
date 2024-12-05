@@ -52,8 +52,7 @@ class PortfoliotService {
         return this.handleError("SEO data not added to database", next);
       }
 
-      return await this.portfoliotRepository.create(data, imageData, seo, user_id);
-      return true;
+      return await this.portfoliotRepository.create(data, imageData, seo, user_id,next);
     } catch (error: any) {
       next(new ErrorHandler(error.message || "Internal Server Error", 500));
     }
@@ -84,7 +83,7 @@ class PortfoliotService {
         return this.handleError("SEO data not added to database", next);
       }
 
-      return await this.portfoliotRepository.update(data, imageData, user_id);
+      return await this.portfoliotRepository.update(data, imageData, user_id,next);
     } catch (error: any) {
       next(new ErrorHandler(error.message || "Internal Server Error", 500));
     }

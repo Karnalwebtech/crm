@@ -2,6 +2,7 @@ import { Router } from "express";
 import upload from "../../../middlewares/multer";
 import CategorieController from "../controllers/post-categorie-controller";
 import { authorizeRoles, isAuthenticatedUser } from "../../../middlewares/auth";
+import PostService from "../../../utils/comman-repositories/get-single-fields";
 
 const categorieRoutes = (postCategorieConroller: CategorieController) => {
   const router = Router();
@@ -18,6 +19,8 @@ const categorieRoutes = (postCategorieConroller: CategorieController) => {
     // authorizeRoles("admin", "employee"),
     postCategorieConroller.all.bind(postCategorieConroller)
   );
+  router.get("/categorie-urls", PostService.getCategorieUrls);
+
   router.get(
     "/data/:id",
     // isAuthenticatedUser,

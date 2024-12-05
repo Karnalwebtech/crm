@@ -154,6 +154,46 @@ class ImageRepository {
     }
     return result;
   }
+
+  async updateImage(
+    image_ids: any,
+    key: string,
+    oldImageId: any,
+    updateData: any,
+    next: NextFunction
+  ) {
+    try {
+      const ImageModel = getImageModel(key);
+      // Update old image if it exists
+      if (oldImageId) {
+        await ImageModel.findByIdAndUpdate(oldImageId, updateData, {
+          new: true,
+        });
+      }
+
+      if (Array.isArray(image_ids)) {
+        // Deactivate the old image if not in the new image list
+        if (!image_ids.includes(oldImageId) && oldImageId) {
+          await ImageModel.findByIdAndUpdate(
+            oldImageId,
+            { is_active: false },
+            { new: true }
+          );
+        }
+
+        // Activate the new images
+        const imageUpdatePromises = image_ids.map((id: any) =>
+          ImageModel.findByIdAndUpdate(id, updateData, { new: true })
+        );
+        await Promise.all(imageUpdatePromises);
+      }
+    } catch (error: any) {
+      console.error(`Error updating images: ${error.message}`);
+      return next(
+        new ErrorHandler(`Error updating images: ${error.message}`, 500)
+      );
+    }
+  }
 }
 
 export default ImageRepository;

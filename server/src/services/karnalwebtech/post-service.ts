@@ -52,7 +52,7 @@ class PostService {
         return this.handleError("SEO data not added to database", next);
       }
 
-      return await this.PostRepository.create(data, imageData, seo, user_id);
+      return await this.PostRepository.create(data, imageData, seo, user_id,next);
       return true;
     } catch (error: any) {
       next(new ErrorHandler(error.message || "Internal Server Error", 500));
@@ -84,7 +84,7 @@ class PostService {
         return this.handleError("SEO data not added to database", next);
       }
 
-      return await this.PostRepository.update(data, imageData, user_id);
+      return await this.PostRepository.update(data, imageData, user_id,next);
     } catch (error: any) {
       next(new ErrorHandler(error.message || "Internal Server Error", 500));
     }

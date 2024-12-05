@@ -9,6 +9,7 @@ export interface IKarnalImages extends Document {
   fieldname: string;
   filename: string;
   path: string;
+  displayedpath: string;
   size: number;
   altText: string;
   title: string;
@@ -25,9 +26,13 @@ const imageSchema: Schema<IKarnalImages> = new mongoose.Schema(
   {
     _no: {
       type: Number,
-      default:0,
+      default: 0,
     },
     originalname: {
+      type: String,
+      default: null,
+    },
+    displayedpath: {
       type: String,
       default: null,
     },
@@ -74,11 +79,11 @@ const imageSchema: Schema<IKarnalImages> = new mongoose.Schema(
     },
     is_active: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     is_delete: {
       type: Boolean,
-      default:false,
+      default: false,
     },
   },
   {
@@ -87,9 +92,7 @@ const imageSchema: Schema<IKarnalImages> = new mongoose.Schema(
 );
 
 // Create and export the Image model
-const KarnalwebtechImageModel: Model<IKarnalImages> = thardConnection.model<IKarnalImages>(
-  "Karnal_Images",
-  imageSchema
-);
+const KarnalwebtechImageModel: Model<IKarnalImages> =
+  thardConnection.model<IKarnalImages>("Karnal_Images", imageSchema);
 
 export default KarnalwebtechImageModel;

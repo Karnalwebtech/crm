@@ -52,7 +52,7 @@ class CategorieService {
         return this.handleError("SEO data not added to database", next);
       }
 
-      return await this.categorieRepository.create(data, imageData, seo, user_id);
+      return await this.categorieRepository.create(data, imageData, seo, user_id,next);
     } catch (error: any) {
       next(new ErrorHandler(error.message || "Internal Server Error", 500));
     }
@@ -83,7 +83,7 @@ class CategorieService {
         return this.handleError("SEO data not added to database", next);
       }
 
-      return await this.categorieRepository.update(data, imageData, user_id);
+      return await this.categorieRepository.update(data, imageData, user_id,next);
     } catch (error: any) {
       next(new ErrorHandler(error.message || "Internal Server Error", 500));
     }

@@ -2,6 +2,7 @@ import { Router } from "express";
 import upload from "../../../middlewares/multer";
 import { authorizeRoles, isAuthenticatedUser } from "../../../middlewares/auth";
 import PostController from "../controllers/post-controller";
+import PostService from "../../../utils/comman-repositories/get-single-fields";
 
 const postRoutes = (postController: PostController) => {
   const router = Router();
@@ -18,6 +19,7 @@ const postRoutes = (postController: PostController) => {
     authorizeRoles("admin", "employee"),
     postController.all.bind(postController)
   );
+  router.get("/post-urls", PostService.getPostUrls);
   router.get(
     "/data/:id",
     // isAuthenticatedUser,

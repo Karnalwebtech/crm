@@ -4,7 +4,8 @@ import ApiFeatures from "../../utils/apiFeatuers";
 import ErrorHandler from "../../utils/ErrorHandler";
 import { generateRandomId } from "../../utils/generateRandomId";
 import PortfolioModel from "../../models/karnalwebtech/portfolio-model";
-
+import ImageRepository from "../../utils/comman-repositories/imageRepository";
+const imageRepository = new ImageRepository();
 class PortfoliotRepository {
   // Reusable function to generate unique post ID
   private generatePostId(
@@ -33,7 +34,13 @@ class PortfoliotRepository {
   }
 
   // Create a new post
-  async create(data: any, image_data: any, seo: any, user_id: string) {
+  async create(
+    data: any,
+    image_data: any,
+    seo: any,
+    user_id: string,
+    next: NextFunction
+  ) {
     try {
       const randomId = generateRandomId();
       const {
@@ -41,7 +48,8 @@ class PortfoliotRepository {
         content,
         uuid,
         categorie,
-        tags,description,
+        tags,
+        description,
         status,
         metaCanonicalUrl,
       } = data;
@@ -58,7 +66,8 @@ class PortfoliotRepository {
         _no: postNumber,
         title,
         content,
-        status,description,
+        status,
+        description,
         categorie: categorie
           ? categorie.split(",")
           : ["6741bd2663fa4c1a8dd7548b"], // Default categorie ID
@@ -69,7 +78,21 @@ class PortfoliotRepository {
         ptfo_id: catId,
         audit_log: user_id,
       };
-
+      // Prepare image update promises for updating the displayed path and activating the image
+      if (imageIds) {
+        const updateData = {
+          displayedpath: newPostData.slug, // Set the displayed path to the category slug
+          is_active: true, // Mark the image as active
+        };
+        const oldImageId = "";
+        await imageRepository.updateImage(
+          imageIds,
+          "karnalwebtech",
+          oldImageId,
+          updateData,
+          next
+        );
+      }
       // Create and save the new post
       const post = new PortfolioModel(newPostData);
       return await post.save();
@@ -129,15 +152,29 @@ class PortfoliotRepository {
   }
 
   // Update a portfolio
-  async update(data: any, image_data: any, user_id: string) {
-    const { title, content, categorie,description, tags, status, metaCanonicalUrl } = data;
+  async update(
+    data: any,
+    image_data: any,
+    user_id: string,
+    next: NextFunction
+  ) {
+    const {
+      title,
+      content,
+      categorie,
+      description,
+      tags,
+      status,
+      metaCanonicalUrl,
+    } = data;
     const image_ids = image_data?.length
       ? image_data.map((item: any) => item._id)
       : data?.images;
 
     const updated_data: any = {
       title,
-      content,description,
+      content,
+      description,
       categorie: categorie
         ? categorie.split(",")
         : ["6741bd2663fa4c1a8dd7548b"], // Default categorie ID
@@ -147,7 +184,9 @@ class PortfoliotRepository {
       feature_image: image_ids?.length ? image_ids : undefined,
       audit_log: user_id,
     };
-
+    const post_prev_data: any = await PortfolioModel.findOne({
+      ptfo_id: data.id,
+    });
     const updated_post = await PortfolioModel.findOneAndUpdate(
       { ptfo_id: data.id },
       updated_data,
@@ -162,6 +201,20 @@ class PortfoliotRepository {
       throw new Error("Post not found");
     }
 
+    if (image_ids) {
+      const updateData = {
+        displayedpath: updated_post.slug, // Set the displayed path to the category slug
+        is_active: true, // Mark the image as active
+      };
+      const oldImageId = post_prev_data.feature_image._id;
+      await imageRepository.updateImage(
+        image_ids,
+        "karnalwebtech",
+        oldImageId,
+        updateData,
+        next
+      );
+    }
     return updated_post;
   }
 
