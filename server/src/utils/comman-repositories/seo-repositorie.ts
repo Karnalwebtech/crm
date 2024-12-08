@@ -14,7 +14,7 @@ const generateSeoData = (data: any, ogImageUrl: string) => ({
   twitter_title: data.metaTitle || data.title,
   twitter_description: data.metaDescription || "Karnal web tech",
   twitter_image: ogImageUrl,
-  canonical_url: data.metaCanonicalUrl || "",
+  canonical_url: data.metaCanonicalUrl.toLowerCase() || "",
 });
 
 class SeoRepositorie {

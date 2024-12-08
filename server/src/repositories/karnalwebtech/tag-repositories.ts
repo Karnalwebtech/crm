@@ -62,7 +62,7 @@ class TagRepository {
         content,
         status,
         type: type,
-        slug: metaCanonicalUrl,
+        slug: metaCanonicalUrl.toLowerCase(),
         feature_image: imageIds[0],
         seo: seo?._id,
         tag_id: tag_id,
@@ -70,7 +70,7 @@ class TagRepository {
       };
       if (imageIds) {
         const updateData = {
-          displayedpath: newData.slug, // Set the displayed path to the category slug
+          displayedpath: newData.slug.toLowerCase(), // Set the displayed path to the category slug
           is_active: true, // Mark the image as active
         };
         const oldImageId = "";
@@ -152,7 +152,7 @@ class TagRepository {
       content,
       description,
       status: status === "" ? "published" : status,
-      slug: metaCanonicalUrl,
+      slug: metaCanonicalUrl.toLowerCase(),
       feature_image: image_ids?.length ? image_ids : undefined,
       audit_log: user_id,
     };
@@ -177,7 +177,7 @@ class TagRepository {
 
     if (image_ids) {
       const updateData = {
-        displayedpath: result.slug, // Set the displayed path to the category slug
+        displayedpath: result.slug.toLowerCase() , // Set the displayed path to the category slug
         is_active: true, // Mark the image as active
       };
       const oldImageId = post_prev_data.feature_image._id;

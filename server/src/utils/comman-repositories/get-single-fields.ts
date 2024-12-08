@@ -44,8 +44,8 @@ class PostService {
   ) {
     try {
       const urls = await PostCategorieModel.find(
-        { is_delete: { $ne: true } },
-        { slug: 1, updatedAt: 1, _id: 0 }
+        { is_delete: { $ne: true },type:{$ne:"portfolio"} },
+        { title: 1,slug: 1, updatedAt: 1, _id: 0 }
       );
       return res.status(200).json(urls);
     } catch (error) {

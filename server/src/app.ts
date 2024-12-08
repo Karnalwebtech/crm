@@ -6,20 +6,14 @@ import helmet from "helmet";
 import csurf from "csurf";
 import rateLimit from "express-rate-limit";
 import errorMiddleware from "./middlewares/error";
+app.set('trust proxy', 1);
 // Middleware to parse JSON bodies
-app.use(express.json());
 // Middleware to parse URL-encoded bodies (form submissions)
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
 app.disable("x-powered-by");
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per window
 });
-app.use(helmet());
-// export const csrfProtection = csurf({ cookie: true });
-// app.use(csrfProtection);
-app.use(limiter);
 app.use(
   cors({
     origin: [
@@ -44,6 +38,13 @@ app.use(
     preflightContinue: false,
   })
 );
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(helmet());
+// export const csrfProtection = csurf({ cookie: true });
+// app.use(csrfProtection);
+app.use(limiter);
 app.get("/api/csrf-token", (req, res) => {
   // console.log('call')
   res

@@ -72,7 +72,7 @@ class PortfoliotRepository {
           ? categorie.split(",")
           : ["6741bd2663fa4c1a8dd7548b"], // Default categorie ID
         tag: tags ? tags.split(",") : ["6741bd9d63fa4c1a8dd7549f"], // Default tag ID
-        slug: metaCanonicalUrl,
+        slug: metaCanonicalUrl.toLowerCase(),
         feature_image: imageIds[0],
         seo: seo?._id,
         ptfo_id: catId,
@@ -81,7 +81,7 @@ class PortfoliotRepository {
       // Prepare image update promises for updating the displayed path and activating the image
       if (imageIds) {
         const updateData = {
-          displayedpath: newPostData.slug, // Set the displayed path to the category slug
+          displayedpath: newPostData.slug.toLowerCase(), // Set the displayed path to the category slug
           is_active: true, // Mark the image as active
         };
         const oldImageId = "";
@@ -180,7 +180,7 @@ class PortfoliotRepository {
         : ["6741bd2663fa4c1a8dd7548b"], // Default categorie ID
       tag: tags ? tags.split(",") : ["6741bd9d63fa4c1a8dd7549f"], // Default tag ID
       status: status === "" ? "published" : status,
-      slug: metaCanonicalUrl,
+      slug: metaCanonicalUrl.toLowerCase(),
       feature_image: image_ids?.length ? image_ids : undefined,
       audit_log: user_id,
     };
@@ -203,7 +203,7 @@ class PortfoliotRepository {
 
     if (image_ids) {
       const updateData = {
-        displayedpath: updated_post.slug, // Set the displayed path to the category slug
+        displayedpath: updated_post.slug.toLowerCase(), // Set the displayed path to the category slug
         is_active: true, // Mark the image as active
       };
       const oldImageId = post_prev_data.feature_image._id;

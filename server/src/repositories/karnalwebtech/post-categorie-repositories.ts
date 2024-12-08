@@ -66,7 +66,7 @@ class CategorieRepository {
         content,
         status,
         type: type,
-        slug: metaCanonicalUrl,
+        slug: metaCanonicalUrl.toLowerCase(),
         feature_image: imageIds[0],
         seo: seo?._id,
         cat_id: catId,
@@ -75,7 +75,7 @@ class CategorieRepository {
 
       if (imageIds) {
         const updateData = {
-          displayedpath: newCategoryData.slug, // Set the displayed path to the category slug
+          displayedpath: newCategoryData.slug.toLowerCase(), // Set the displayed path to the category slug
           is_active: true, // Mark the image as active
         };
         const oldImageId = "";
@@ -178,7 +178,7 @@ class CategorieRepository {
       content,
       description,
       status: status === "" ? "published" : status,
-      slug: metaCanonicalUrl,
+      slug: metaCanonicalUrl.toLowerCase(),
       feature_image: image_ids?.length ? image_ids : undefined,
       audit_log: user_id,
     };
@@ -206,7 +206,7 @@ class CategorieRepository {
 
     if (image_ids) {
       const updateData = {
-        displayedpath: updated_category.slug, // Set the displayed path to the category slug
+        displayedpath: updated_category.slug.toLowerCase(), // Set the displayed path to the category slug
         is_active: true, // Mark the image as active
       };
       const oldImageId = post_prev_data.feature_image._id;

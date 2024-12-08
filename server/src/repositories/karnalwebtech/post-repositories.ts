@@ -66,7 +66,7 @@ class PostRepository {
           ? categorie.split(",")
           : ["6741bd2663fa4c1a8dd7548b"], // Default categorie ID
         tag: tags ? tags.split(",") : ["6741bd9d63fa4c1a8dd7549f"], // Default tag ID
-        slug: metaCanonicalUrl,
+        slug: metaCanonicalUrl.toLowerCase(),
         feature_image: imageIds[0],
         seo: seo?._id,
         post_id: catId,
@@ -84,7 +84,7 @@ class PostRepository {
 
       if (imageIds) {
         const updateData = {
-          displayedpath:  `${savedPost?.categorie[0]?.slug}/${newPostData.slug}`, // Set the displayed path to the category slug
+          displayedpath:  `${savedPost?.categorie[0]?.slug.toLowerCase()}/${newPostData.slug.toLowerCase()}`, // Set the displayed path to the category slug
           is_active: true, // Mark the image as active
         };
         const oldImageId = "";
@@ -176,7 +176,7 @@ class PostRepository {
         : ["6741bd2663fa4c1a8dd7548b"], // Default categorie ID
       tag: tags ? tags.split(",") : ["6741bd9d63fa4c1a8dd7549f"], // Default tag ID
       status: status === "" ? "published" : status,
-      slug: metaCanonicalUrl,
+      slug: metaCanonicalUrl.toLowerCase(),
       feature_image: image_ids?.length ? image_ids : undefined,
       audit_log: user_id,
     };
@@ -201,7 +201,7 @@ class PostRepository {
 
     if (image_ids) {
       const updateData = {
-        displayedpath:  `${updated_post?.categorie[0]?.slug}/${updated_post.slug}`, 
+        displayedpath:  `${updated_post?.categorie[0]?.slug.toLowerCase()}/${updated_post.slug.toLowerCase()}`, 
         is_active: true, // Mark the image as active
       };
       const oldImageId = post_prev_data.feature_image._id;
