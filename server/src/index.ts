@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 8000;
 const numCPUs = os.cpus().length;
 if (cluster.isMaster) {
   // Listen for dying workers and restart them
-
+  console.log(`Master ${process.pid} is running`);
   for (let i = 0; i < numCPUs; i++) {
     cluster.fork();
   }
