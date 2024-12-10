@@ -103,7 +103,7 @@ class PortfolioController {
       if (!id) {
         return next(new ErrorHandler("ID parameter is required.", 400));
       }
-      const cacheKey = `project_${id}`;
+      const cacheKey = `proje_${id}`;
       console.log(`Checking cache for key: ${cacheKey}`);
 
       const cachedPosts = await redisClient2.get(cacheKey);
