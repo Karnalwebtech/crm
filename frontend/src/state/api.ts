@@ -1,3 +1,4 @@
+import cookiesManager from "@/lib/service/cookies-axis/Cookies";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -56,12 +57,46 @@ export interface User {
   name: string;
   email: string;
 }
+interface Cache {
+  pattern: string;
+}
 
 export const api = createApi({
-  baseQuery: fetchBaseQuery({ baseUrl: apiUrl }),
   reducerPath: "api",
-  tagTypes: ["DashboardMetrics", "csrf", "Products", "Users", "Expenses"],
+  baseQuery: fetchBaseQuery({
+    baseUrl: apiUrl,
+    prepareHeaders: (headers) => {
+      const token = cookiesManager.get("token"); // Get token from cookies
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`); // Set the Authorization header
+      }
+      return headers;
+    },
+    credentials: "include",
+  }),
+
+  tagTypes: [
+    "DashboardMetrics",
+    "cache",
+    "csrf",
+    "Products",
+    "Users",
+    "Expenses",
+  ],
   endpoints: (build) => ({
+    removeCache: build.mutation<any, any>({
+      query: (data) => {
+        console.log(data);
+        const formData = new FormData();
+        formData.append("key", data?.pattern || "");
+        return {
+          url: "v2/remove-cache",
+          method: "POST",
+          body: formData, // Use formData as body
+        };
+      },
+      invalidatesTags: ["cache"],
+    }),
     fetchCsrfToken: build.query<any, any>({
       query: () => "/csrf-token",
       providesTags: ["csrf"],
@@ -97,10 +132,12 @@ export const api = createApi({
 });
 
 export const {
-  useFetchCsrfTokenQuery,useLazyFetchCsrfTokenQuery ,
+  useFetchCsrfTokenQuery,
+  useLazyFetchCsrfTokenQuery,
   useGetDashboardMetricsQuery,
   useGetProductsQuery,
   useCreateProductMutation,
   useGetUsersQuery,
   useGetExpensesByCategoryQuery,
+  useRemoveCacheMutation,
 } = api;

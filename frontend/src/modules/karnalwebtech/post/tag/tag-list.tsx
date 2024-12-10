@@ -19,8 +19,11 @@ import {
   useDeleteTagMutation,
   useGetAllTagQuery,
 } from "../../../../state/karnal-web-tech/tagApi";
+import CacheRemover from "@/components/common/CacheRemover";
+import { cache_keys } from "@/lib/service/custom_keys";
+import { useRemoveCacheMutation } from "@/state/api";
 
-interface list_props {}
+interface list_props { }
 
 const TagList: React.FC<list_props> = () => {
   const [rowsPerPage, setRowsPerPage] = useState<string>("25");
@@ -29,6 +32,7 @@ const TagList: React.FC<list_props> = () => {
   const router = useRouter();
 
   //---------- all hookes
+  const [update] = useRemoveCacheMutation()
   const { data, error, isLoading } = useGetAllTagQuery({
     rowsPerPage: Number(rowsPerPage),
     page: page,
@@ -60,7 +64,12 @@ const TagList: React.FC<list_props> = () => {
     "Action",
   ];
   const categorie_dropdown: any[] = [];
-  const removeRow = async (remove_id: string) => {
+  const removeRow = async (remove_id: string, slug: string) => {
+    const pattern: string[] = [remove_id, slug, cache_keys.tags]
+    for (const item of pattern) {
+      const updatedData = { pattern: item };
+      await update(updatedData).unwrap(); // Ensure the mutation completes before continuing
+    }
     await deleteTag(remove_id);
   };
   function tabel_body() {
@@ -86,6 +95,11 @@ const TagList: React.FC<list_props> = () => {
               >
                 Copy ID
               </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer"
+              >
+                <CacheRemover pattern={[`${post.tag_id}`, `tag_${post.slug}`]} buttonStyle="bg-transparent text-black hover:bg-transparent p-0 border-hidden" />
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="cursor-pointer"
@@ -97,7 +111,7 @@ const TagList: React.FC<list_props> = () => {
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="cursor-pointer flex items-center"
-                onClick={() => removeRow(post.tag_id)}
+                onClick={() => removeRow(post.tag_id, `tag_${post.slug}`)}
               >
                 <Trash2 color="red" /> Delete
               </DropdownMenuItem>

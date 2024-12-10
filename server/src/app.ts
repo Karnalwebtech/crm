@@ -3,7 +3,7 @@ import express from "express";
 const app = express();
 import cors from "cors";
 import helmet from "helmet";
-import csurf from "csurf";
+// import csurf from "csurf";
 import rateLimit from "express-rate-limit";
 import errorMiddleware from "./middlewares/error";
 app.set('trust proxy', 1);
@@ -45,13 +45,13 @@ app.use(helmet());
 // export const csrfProtection = csurf({ cookie: true });
 // app.use(csrfProtection);
 app.use(limiter);
-app.get("/api/csrf-token", (req, res) => {
-  // console.log('call')
-  res
-    .status(200)
-    .cookie("XSRF-TOKEN", req.csrfToken())
-    .json({ success: true, token: req.csrfToken() }); // Optional, for other use cases
-});
+// app.get("/api/csrf-token", (req, res) => {
+//   // console.log('call')
+//   res
+//     .status(200)
+//     .cookie("XSRF-TOKEN", req.csrfToken())
+//     .json({ success: true, token: req.csrfToken() }); // Optional, for other use cases
+// });
 //-----loaders
 //------------------ crm
 import crm_repositoriesLoader from "./loaders/crm/repositoriesLoader";
@@ -72,7 +72,8 @@ import karnal_controllersLoader from "./loaders/karnalwebtech/controllersLoader"
 import karnal_routesLoader from "./app-routes/karnal-web-tech-loader";
 import ImageRepository from "./utils/comman-repositories/imageRepository";
 import ImageController from "./api/karnalwebtech/controllers/image-controller";
-import portfolioRoutes from "./api/karnalwebtech/routes/portfolio-route";
+// import portfolioRoutes from "./api/karnalwebtech/routes/portfolio-route";
+import cacheRouter from "./api/karnalwebtech/routes/cache-route";
 import imageRoutes from "./api/karnalwebtech/routes/image-route";
 const karnal_repositories = karnal_repositoriesLoader();
 const karnal_services = karnal_servicesLoader(karnal_repositories);
@@ -88,6 +89,7 @@ const imageController = new ImageController(imageRepository);
 
 // Add routes
 app.use("/api/v2/image", imageRoutes(imageController));
+app.use("/api/v2/", cacheRouter);
 //--------------- allmiddleware
 app.use(errorMiddleware);
 

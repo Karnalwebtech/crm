@@ -19,8 +19,11 @@ import { Button } from "@/components/ui/button";
 import { Trash2, MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useHandleNotifications } from "@/hooks/useHandleNotifications";
+import CacheRemover from "@/components/common/CacheRemover";
+import { cache_keys } from "@/lib/service/custom_keys";
+import { useRemoveCacheMutation } from "@/state/api";
 
-interface Customer_list_props {}
+interface Customer_list_props { }
 
 const CategorieList: React.FC<Customer_list_props> = () => {
   const [rowsPerPage, setRowsPerPage] = useState<string>("25");
@@ -29,6 +32,7 @@ const CategorieList: React.FC<Customer_list_props> = () => {
   const router = useRouter();
 
   //---------- all hookes
+  const [update] = useRemoveCacheMutation()
   const { data, error, isLoading } = useGetAllcategorieQuery({
     rowsPerPage: Number(rowsPerPage),
     page: page,
@@ -60,7 +64,12 @@ const CategorieList: React.FC<Customer_list_props> = () => {
     "Action",
   ];
   const categorie_dropdown: any[] = [];
-  const removeRow = async (remove_id: string) => {
+  const removeRow = async (remove_id: string, slug: string) => {
+    const pattern: string[] = [remove_id, slug, cache_keys.categorie]
+    for (const item of pattern) {
+      const updatedData = { pattern: item };
+      await update(updatedData).unwrap(); // Ensure the mutation completes before continuing
+    }
     await deleteCateorie(remove_id);
   };
   function tabel_body() {
@@ -86,6 +95,11 @@ const CategorieList: React.FC<Customer_list_props> = () => {
               >
                 Copy ID
               </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer"
+              >
+                <CacheRemover pattern={[`${post.cat_id}`, `cate_${post.slug}`]} buttonStyle="bg-transparent text-black hover:bg-transparent p-0 border-hidden" />
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="cursor-pointer"
@@ -97,7 +111,7 @@ const CategorieList: React.FC<Customer_list_props> = () => {
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="cursor-pointer flex items-center"
-                onClick={() => removeRow(post.cat_id)}
+                onClick={() => removeRow(post.cat_id, `cate_${post.slug}`)}
               >
                 <Trash2 color="red" /> Delete
               </DropdownMenuItem>

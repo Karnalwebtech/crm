@@ -12,15 +12,18 @@ import { TimeAgo } from "@/lib/service/time/timeAgo";
 import Shadcn_table from "@/components/common/shadcn-table/table";
 import { useTableFilters } from "@/hooks/useTableFilters";
 import { Button } from "@/components/ui/button";
-import { Trash2, MoreHorizontal } from "lucide-react";
+import { Trash2, Pencil, Copy, MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useHandleNotifications } from "@/hooks/useHandleNotifications";
 import {
   useDeletePostMutation,
   useGetAllPostQuery,
 } from "@/state/karnal-web-tech/postApi";
+import CacheRemover from "@/components/common/CacheRemover";
+import { useRemoveCacheMutation } from "@/state/api";
+import { cache_keys } from "@/lib/service/custom_keys";
 
-interface list_props {}
+interface list_props { }
 
 const PostList: React.FC<list_props> = () => {
   const [rowsPerPage, setRowsPerPage] = useState<string>("25");
@@ -29,6 +32,7 @@ const PostList: React.FC<list_props> = () => {
   const router = useRouter();
 
   //---------- all hookes
+  const [update] = useRemoveCacheMutation()
   const { data, error, isLoading } = useGetAllPostQuery({
     rowsPerPage: Number(rowsPerPage),
     page: page,
@@ -43,7 +47,6 @@ const PostList: React.FC<list_props> = () => {
     successMessage: "Post deleted successfully!",
   });
   const { data: api_data } = data || {};
-  console.log(api_data);
   const {
     searchTerm,
     setSearchTerm,
@@ -60,7 +63,12 @@ const PostList: React.FC<list_props> = () => {
     "Action",
   ];
   const categorie_dropdown: any[] = [];
-  const removeRow = async (remove_id: string) => {
+  const removeRow = async (remove_id: string, slug: string) => {
+    const pattern: string[] = [remove_id, slug,cache_keys.posts]
+    for (const item of pattern) {
+      const updatedData = { pattern: item };
+      await update(updatedData).unwrap(); // Ensure the mutation completes before continuing
+    }
     await deleteTag(remove_id);
   };
   function tabel_body() {
@@ -84,7 +92,12 @@ const PostList: React.FC<list_props> = () => {
                 className="cursor-pointer"
                 onClick={() => navigator.clipboard.writeText(post.post_id)}
               >
-                Copy ID
+                <Copy /> Copy ID
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer"
+              >
+                <CacheRemover pattern={[`${post.post_id}`, `post_${post.slug}`]} buttonStyle="bg-transparent text-black hover:bg-transparent p-0 border-hidden" />
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
@@ -93,11 +106,11 @@ const PostList: React.FC<list_props> = () => {
                   router.push(`/karnalwebtech/post/${post.post_id}`)
                 }
               >
-                Edit Post
+                <Pencil /> Edit Post
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="cursor-pointer flex items-center"
-                onClick={() => removeRow(post.post_id)}
+                onClick={() => removeRow(post.post_id, post.slug)}
               >
                 <Trash2 color="red" /> Delete
               </DropdownMenuItem>
@@ -129,4 +142,4 @@ const PostList: React.FC<list_props> = () => {
   );
 };
 
-export default PostList;
+export default React.memo(PostList);

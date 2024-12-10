@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import AsyncHandler from "../../../middlewares/AsyncHandler";
 import ErrorHandler from "../../../utils/ErrorHandler";
 import TagService from "../../../services/karnalwebtech/tag-service";
+import { redisClient2 } from "../../../loaders/redis";
 
 class TagController {
   constructor(private tagService: TagService) {}
@@ -61,12 +62,29 @@ class TagController {
     async (req: Request, res: Response, next: NextFunction) => {
       const query = req.query;
       const resultPerPage = Number(query.rowsPerPage);
-
+      const cacheKey = `tags_${new URLSearchParams(query as any).toString()}`;
+      const catCashe = await redisClient2.get(cacheKey);
+      if (catCashe) {
+        console.log("cashe his");
+        return res.json(JSON.parse(catCashe)); // Return cached posts
+      }
+      console.log("cashe miss");
       // Fetch tag and data counter
       const [result, dataCounter] = await Promise.all([
         this.tagService.all(query),
         this.tagService.data_counter(query),
       ]);
+
+      const cacheData = {
+        success: true,
+        message: "Tag cache fetched successfully",
+        data: {
+          result: result, // Assuming result is plain data
+          rowsPerPage: resultPerPage,
+          dataCounter: dataCounter,
+        },
+      };
+      await redisClient2.set(cacheKey, JSON.stringify(cacheData));
 
       return this.sendResponse(res, "Tag fetched successfully", 200, {
         result,
@@ -83,10 +101,25 @@ class TagController {
       if (!id) {
         return next(new ErrorHandler("ID parameter is required.", 400));
       }
+      const cacheKey = `${id}`;
+      console.log(`Checking cache for key: ${cacheKey}`);
 
+      const cachedPosts = await redisClient2.get(cacheKey);
+      if (cachedPosts) {
+        console.log("Cache hit");
+        return res.json(JSON.parse(cachedPosts)); // Return cached posts
+      }
+      console.log("Cache miss");
       // Fetch tag by ID
       const result = await this.tagService.findBYpageid(id, next);
       if (result) {
+        const cacheData = {
+          success: true,
+          message: "Tag cache fetched successfully",
+          data:result,
+        };
+        await redisClient2.set(cacheKey, JSON.stringify(cacheData)); // Cache for 1 hour
+
         return this.sendResponse(res, "Tag fetched successfully", 200, result);
       }
 
