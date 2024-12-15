@@ -3,10 +3,11 @@ import cluster from "cluster";
 import os from "os";
 import dotenv from "dotenv";
 import { connectRedis } from "./loaders/redis";
+import { test } from "./test";
 
 dotenv.config();
 connectRedis();
-
+test()
 const PORT = process.env.PORT || 8000;
 const numCPUs = os.cpus().length;
 

@@ -12,7 +12,7 @@ import { TimeAgo } from "@/lib/service/time/timeAgo";
 import Shadcn_table from "@/components/common/shadcn-table/table";
 import { useTableFilters } from "@/hooks/useTableFilters";
 import { Button } from "@/components/ui/button";
-import { Trash2, MoreHorizontal } from "lucide-react";
+import { Trash2, Pencil, Copy, MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useHandleNotifications } from "@/hooks/useHandleNotifications";
 import {
@@ -93,7 +93,7 @@ const TagList: React.FC<list_props> = () => {
                 className="cursor-pointer"
                 onClick={() => navigator.clipboard.writeText(post.tag_id)}
               >
-                Copy ID
+               <Copy/> Copy ID
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="cursor-pointer"
@@ -107,7 +107,7 @@ const TagList: React.FC<list_props> = () => {
                   router.push(`/karnalwebtech/post/tag/${post.tag_id}`)
                 }
               >
-                Edit Tag
+                <Pencil/> Edit Tag
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="cursor-pointer flex items-center"

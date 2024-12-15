@@ -103,7 +103,7 @@ class PortfolioController {
       if (!id) {
         return next(new ErrorHandler("ID parameter is required.", 400));
       }
-      const cacheKey = `proje_${id}`;
+      const cacheKey = id;
       console.log(`Checking cache for key: ${cacheKey}`);
 
       const cachedPosts = await redisClient2.get(cacheKey);
@@ -118,7 +118,7 @@ class PortfolioController {
         const cacheData = {
           success: true,
           message: "Projects cache fetched successfully",
-          result,
+          data:result,
         };
         await redisClient2.set(cacheKey, JSON.stringify(cacheData)); // Cache for 1 hour
         return this.sendResponse(res, "Post fetched successfully", 200, result);

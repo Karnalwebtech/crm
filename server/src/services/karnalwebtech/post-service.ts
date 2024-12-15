@@ -53,7 +53,6 @@ class PostService {
       }
 
       return await this.PostRepository.create(data, imageData, seo, user_id,next);
-      return true;
     } catch (error: any) {
       next(new ErrorHandler(error.message || "Internal Server Error", 500));
     }

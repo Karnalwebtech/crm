@@ -12,15 +12,18 @@ import { TimeAgo } from "@/lib/service/time/timeAgo";
 import Shadcn_table from "@/components/common/shadcn-table/table";
 import { useTableFilters } from "@/hooks/useTableFilters";
 import { Button } from "@/components/ui/button";
-import { Trash2, MoreHorizontal } from "lucide-react";
+import { Trash2, Pencil, Copy, MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useHandleNotifications } from "@/hooks/useHandleNotifications";
 import {
   useDeletePortfolioMutation,
   useGetAllPortfolioQuery,
 } from "@/state/karnal-web-tech/portfolioApi";
+import { cache_keys } from "@/lib/service/custom_keys";
+import { useRemoveCacheMutation } from "@/state/api";
+import CacheRemover from "@/components/common/CacheRemover";
 
-interface list_props {}
+interface list_props { }
 
 const PortfolioList: React.FC<list_props> = () => {
   const [rowsPerPage, setRowsPerPage] = useState<string>("25");
@@ -29,6 +32,7 @@ const PortfolioList: React.FC<list_props> = () => {
   const router = useRouter();
 
   //---------- all hookes
+  const [update] = useRemoveCacheMutation()
   const { data, error, isLoading } = useGetAllPortfolioQuery({
     rowsPerPage: Number(rowsPerPage),
     page: page,
@@ -61,6 +65,11 @@ const PortfolioList: React.FC<list_props> = () => {
   ];
   const categorie_dropdown: any[] = [];
   const removeRow = async (remove_id: string) => {
+    const pattern: string[] = [remove_id, cache_keys.projects]
+    for (const item of pattern) {
+      const updatedData = { pattern: item };
+      await update(updatedData).unwrap(); // Ensure the mutation completes before continuing
+    }
     await deleteTag(remove_id);
   };
   function tabel_body() {
@@ -84,8 +93,9 @@ const PortfolioList: React.FC<list_props> = () => {
                 className="cursor-pointer"
                 onClick={() => navigator.clipboard.writeText(post.ptfo_id)}
               >
-                Copy ID
+                <Copy />  Copy ID
               </DropdownMenuItem>
+              <CacheRemover pattern={[`${post.ptfo_id}`]} buttonStyle="bg-transparent text-black hover:bg-transparent p-0 border-hidden" />
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="cursor-pointer"
@@ -93,7 +103,7 @@ const PortfolioList: React.FC<list_props> = () => {
                   router.push(`/karnalwebtech/portfolio/${post.ptfo_id}`)
                 }
               >
-                Edit portfolio
+                <Pencil />   Edit portfolio
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="cursor-pointer flex items-center"
