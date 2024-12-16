@@ -44,7 +44,6 @@ export const karnal_CategorieApi = createApi({
     }),
     update: builder.mutation<any, any>({
       query: (data) => {
-        console.log(data);
         const formData = new FormData();
         for (let [key, value] of Object.entries(data)) {
           if (key === "images" && Array.isArray(value)) {

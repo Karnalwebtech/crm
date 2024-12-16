@@ -14,7 +14,7 @@ export function Modal({ title, isOpen, onClose, children }: ModalProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[90%] max-h-[640px] px-0 overflow-hidden lg:w-[50%] bg-black text-white text-lg border-0 max-w-none">
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
+          <DialogTitle className="px-4">{title}</DialogTitle>
         </DialogHeader>
         {children}
       </DialogContent>

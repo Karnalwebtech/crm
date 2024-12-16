@@ -11,7 +11,7 @@ import { navItems } from "./config";
 export const workspce_selector = [
   { key: "crm", label: "CRM" },
   { key: "dashboard", label: "Dashboard" },
-  { key: "streaming", label: "Streaming" },
+  { key: "anime", label: "Anime" },
   { key: "karnalwebtech", label: "Karnal Web Tech" },
 ];
 

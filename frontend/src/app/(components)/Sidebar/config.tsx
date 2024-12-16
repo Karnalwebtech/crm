@@ -23,26 +23,26 @@ export const navItems: MenuListProps[] = [
       {
         title: "Product & Service",
         label: "Product & Service",
-        icon: 'ScanText',
+        icon: "ScanText",
         href: paths.crm.product_service,
       },
       {
         title: "Customer",
         label: "Customer",
-        icon: 'User',
+        icon: "User",
         href: paths.crm.customer,
       },
       {
         title: "Vendor",
         label: "Vendor",
-        icon: 'UserX',
+        icon: "UserX",
         href: paths.crm.vendor,
       },
       {
         title: "Orders",
         label: "Orders",
-        icon: 'ShoppingCart',
-        href: '',
+        icon: "ShoppingCart",
+        href: "",
         page_data: [
           {
             key: "list",
@@ -56,14 +56,13 @@ export const navItems: MenuListProps[] = [
             href: paths.crm.order.form,
             icon: "ShoppingBag",
           },
-
         ],
       },
       {
         title: "Puschases",
         label: "Puschases",
-        icon: 'ShoppingCart',
-        href: '',
+        icon: "ShoppingCart",
+        href: "",
         page_data: [
           {
             key: "list",
@@ -77,18 +76,18 @@ export const navItems: MenuListProps[] = [
             href: paths.crm.purchases.form,
             icon: "ShoppingBag",
           },
-
         ],
-      }, {
+      },
+      {
         title: "Expense",
         label: "expense",
-        icon: 'ReceiptIndianRupee',
+        icon: "ReceiptIndianRupee",
         href: paths.crm.expense,
       },
       {
         title: "Users",
         label: "Users",
-        icon: 'CircleUser',
+        icon: "CircleUser",
         href: paths.crm.users,
       },
     ],
@@ -99,19 +98,19 @@ export const navItems: MenuListProps[] = [
       {
         title: "Products",
         label: "Products",
-        icon: 'Layout',
+        icon: "Layout",
         href: paths.dashboard.products,
       },
       {
         title: "Inventory",
         label: "Inventory",
-        icon: 'Layout',
+        icon: "Layout",
         href: paths.dashboard.inventory,
       },
       {
         title: "Users",
         label: "Users",
-        icon: 'CircleUser',
+        icon: "CircleUser",
         href: paths.dashboard.users,
       },
     ],
@@ -122,14 +121,20 @@ export const navItems: MenuListProps[] = [
       {
         title: "Media",
         label: "Media",
-        icon: 'Image',
+        icon: "Image",
         href: paths.karnalwebtech.media,
+      },
+      {
+        title: "Contacts",
+        label: "Contacts",
+        icon: "Contact",
+        href: paths.karnalwebtech.contacts,
       },
       {
         title: "Posts",
         label: "Posts",
-        icon: 'CirclePlus',
-        href: '',
+        icon: "CirclePlus",
+        href: "",
         page_data: [
           {
             key: "Post",
@@ -143,7 +148,7 @@ export const navItems: MenuListProps[] = [
             href: paths.karnalwebtech.post_categorie,
             icon: "Component",
           },
-          
+
           {
             key: "post-tag",
             title: "Tag",
@@ -155,8 +160,8 @@ export const navItems: MenuListProps[] = [
       {
         title: "portfolios",
         label: "Portfolios",
-        icon: 'BriefcaseBusiness',
-        href: '',
+        icon: "BriefcaseBusiness",
+        href: "",
         page_data: [
           {
             key: "Portfolio",
@@ -170,7 +175,7 @@ export const navItems: MenuListProps[] = [
             href: paths.karnalwebtech.portfolio_categorie,
             icon: "Component",
           },
-          
+
           {
             key: "portfolio-tag",
             title: "Tag",
@@ -178,29 +183,56 @@ export const navItems: MenuListProps[] = [
             icon: "Tag",
           },
         ],
-      }
-    ]
+      },
+    ],
   },
   {
-    key: "streaming",
+    key: "anime",
     pages: [
+      {
+        title: "Movies",
+        label: "Movies",
+        icon: "CirclePlus",
+        href: "",
+        page_data: [
+          {
+            key: "Movie",
+            title: "Movie",
+            href: paths.anime.movie,
+            icon: "CirclePlus",
+          },
+          {
+            key: "movie-categorie",
+            title: "Categorie",
+            href: paths.anime.categorie,
+            icon: "Component",
+          },
+
+          {
+            key: "post-tag",
+            title: "Tag",
+            href: paths.karnalwebtech.post_tag,
+            icon: "Tag",
+          },
+        ],
+      },
       {
         title: "Upload video",
         label: "Upload video",
-        icon: 'Layout',
-        href: paths.streaming.uploadVideo,
+        icon: "Layout",
+        href: paths.anime.uploadVideo,
       },
       {
         title: "Inventory",
         label: "Inventory",
-        icon: 'Layout',
-        href: paths.dashboard.inventory,
+        icon: "Layout",
+        href: paths.anime.inventory,
       },
       {
         title: "Users",
         label: "Users",
-        icon: 'CircleUser',
-        href: paths.dashboard.users,
+        icon: "CircleUser",
+        href: paths.anime.users,
       },
     ],
   },

@@ -34,7 +34,8 @@ class ContactUsController {
   all = AsyncHandler.handle(
     async (req: Request, res: Response, next: NextFunction) => {
       const query = req.query;
-      const resultPerPage = Number(query.rowsPerPage);
+      console.log(query)
+      const resultPerPage = Number(query.rowsPerPage) || 25;
       const [result, dataCounter] = await Promise.all([
         this.contactUsService.all(query),
         this.contactUsService.data_counter(query),

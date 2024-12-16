@@ -18,7 +18,9 @@ body,
   @apply bg-gray-500;
   @apply text-gray-900;
 }
-
+body {
+  pointer-events: all !important;
+}
 @media (min-width: 768px) {
   .custom-grid-rows {
     grid-template-rows: repeat(8, 20vh);
@@ -152,13 +154,13 @@ body,
 
 .dark-custom .jodit-workplace,
 .dark-custom .jodit-toolbar__box {
-background: black !important;
-    border:0px solid rgb(229 231 235) !important;
-    color: rgb(229 231 235) !important;
+  background: black !important;
+  border: 0px solid rgb(229 231 235) !important;
+  color: rgb(229 231 235) !important;
 }
-.dark-custom .jodit-toolbar-button__button:hover svg{
- fill: #000 !important;    
+.dark-custom .jodit-toolbar-button__button:hover svg {
+  fill: #000 !important;
 }
-.dark-custom .jodit-toolbar-button__button svg{
- fill: rgb(229 231 235) !important;
+.dark-custom .jodit-toolbar-button__button svg {
+  fill: rgb(229 231 235) !important;
 }

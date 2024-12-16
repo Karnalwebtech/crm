@@ -2,65 +2,6 @@ import cookiesManager from "@/lib/service/cookies-axis/Cookies";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-export interface Product {
-  productId: string;
-  name: string;
-  price: number;
-  rating?: number;
-  stockQuantity: number;
-}
-
-export interface NewProduct {
-  name: string;
-  price: number;
-  rating?: number;
-  stockQuantity: number;
-}
-
-export interface SalesSummary {
-  salesSummaryId: string;
-  totalValue: number;
-  changePercentage?: number;
-  date: string;
-}
-
-export interface PurchaseSummary {
-  purchaseSummaryId: string;
-  totalPurchased: number;
-  changePercentage?: number;
-  date: string;
-}
-
-export interface ExpenseSummary {
-  expenseSummarId: string;
-  totalExpenses: number;
-  date: string;
-}
-
-export interface ExpenseByCategorySummary {
-  expenseByCategorySummaryId: string;
-  category: string;
-  amount: string;
-  date: string;
-}
-
-export interface DashboardMetrics {
-  popularProducts: Product[];
-  salesSummary: SalesSummary[];
-  purchaseSummary: PurchaseSummary[];
-  expenseSummary: ExpenseSummary[];
-  expenseByCategorySummary: ExpenseByCategorySummary[];
-}
-
-export interface User {
-  userId: string;
-  name: string;
-  email: string;
-}
-interface Cache {
-  pattern: string;
-}
-
 export const api = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
@@ -75,14 +16,7 @@ export const api = createApi({
     credentials: "include",
   }),
 
-  tagTypes: [
-    "DashboardMetrics",
-    "cache",
-    "csrf",
-    "Products",
-    "Users",
-    "Expenses",
-  ],
+  tagTypes: ["cache", "contact-us"],
   endpoints: (build) => ({
     removeCache: build.mutation<any, any>({
       query: (data) => {
@@ -97,47 +31,35 @@ export const api = createApi({
       },
       invalidatesTags: ["cache"],
     }),
-    fetchCsrfToken: build.query<any, any>({
-      query: () => "/csrf-token",
-      providesTags: ["csrf"],
-    }),
-    getDashboardMetrics: build.query<DashboardMetrics, void>({
-      query: () => "/dashboard",
-      providesTags: ["DashboardMetrics"],
-    }),
-    getProducts: build.query<Product[], string | void>({
-      query: (search) => ({
-        url: "/products",
-        params: search ? { search } : {},
-      }),
-      providesTags: ["Products"],
-    }),
-    createProduct: build.mutation<Product, NewProduct>({
-      query: (newProduct) => ({
-        url: "/products",
-        method: "POST",
-        body: newProduct,
-      }),
-      invalidatesTags: ["Products"],
-    }),
-    getUsers: build.query<User[], void>({
-      query: () => "/users",
-      providesTags: ["Users"],
-    }),
-    getExpensesByCategory: build.query<ExpenseByCategorySummary[], void>({
-      query: () => "/expenses",
-      providesTags: ["Expenses"],
+    getAllContacts: build.query<
+      any,
+      {
+        rowsPerPage?: number;
+        page?: number;
+      } | void
+    >({
+      query: (filters) => {
+        const params: Record<string, string | number | boolean> = {
+          // is_active: filters.is_active, // Default to true
+        };
+        if (filters) {
+          if (filters.rowsPerPage) {
+            params.rowsPerPage = filters.rowsPerPage; // Convert number to string
+          }
+          if (filters.page) {
+            params.page = filters.page; // Convert number to string
+          }
+        }
+
+        return {
+          url: "v2/contact-us",
+          params,
+          method: "GET",
+        };
+      },
+      providesTags: ["contact-us"],
     }),
   }),
 });
 
-export const {
-  useFetchCsrfTokenQuery,
-  useLazyFetchCsrfTokenQuery,
-  useGetDashboardMetricsQuery,
-  useGetProductsQuery,
-  useCreateProductMutation,
-  useGetUsersQuery,
-  useGetExpensesByCategoryQuery,
-  useRemoveCacheMutation,
-} = api;
+export const { useRemoveCacheMutation, useGetAllContactsQuery } = api;

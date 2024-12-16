@@ -12,20 +12,9 @@ const contactUsRoutes = (contactUsController: ContactUsController) => {
   );
   router.get(
     "/",
+    isAuthenticatedUser,
+    authorizeRoles("admin", "employee"),
     contactUsController.all.bind(contactUsController)
-  );
-  router.get(
-    "/data/:id",
-    contactUsController.get_single_data.bind(contactUsController)
-  );
-  router.delete(
-    "/data/:id",
-    contactUsController.removeItem.bind(contactUsController)
-  );
-  router.put(
-    "/update",
-    upload.array("images", 10),
-    contactUsController.update.bind(contactUsController)
   );
   return router;
 };
