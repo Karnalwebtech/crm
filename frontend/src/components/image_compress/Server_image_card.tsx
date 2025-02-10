@@ -23,7 +23,7 @@ interface ImageCardProps {
   watch?: (field: string) => any;
   keywords?: string[];
   setKeywords?: (keywords: string[]) => void;
-  getSingleDataHandler: (id: string) => Promise<void> | void;
+  getSingleDataHandler?: (id: string) => Promise<void> | void;
   isLoading?: boolean;
   isUpdateLoading?: boolean;
   isSuccess?: boolean;
