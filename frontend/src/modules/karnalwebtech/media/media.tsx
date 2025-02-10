@@ -53,7 +53,7 @@ export default function ImageGallery() {
     await update(updated_data);
   };
 
-  const getSingleDataHandler = async (id: string) => {
+  const getSingleDataHandler = async (id: string): Promise<void>=> {
     await getSingle(id);
   };
 
