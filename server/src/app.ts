@@ -24,7 +24,7 @@ app.use(
       "https://karnalwebtech-two.vercel.app",
       "https://www.thesalesmens.com",
       "https://thesalesmens.com",
-      "https://crm-2symzvlfd-karnalwebtechs-projects.vercel.app"
+      "https://crm-three-rho.vercel.app"
     ], // Allow only your frontend to access the API
     methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed methods
     exposedHeaders: "Set-Cookie",
